@@ -1,0 +1,7 @@
+# MedBoard Administrator Console is protected by HTTP Basic Auth.
+# Credentials live in the staff-shared private/ directory (not ideal, but that's
+# how the previous admin left it before offboarding).
+AuthType Basic
+AuthName "Talad Phra Administrator Console"
+AuthUserFile /var/www/html/private/.htpasswd
+Require valid-user

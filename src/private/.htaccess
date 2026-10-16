@@ -1,0 +1,4 @@
+# Block direct HTTP access to the recovery note.
+# PHP readfile() (the path-traversal sink in view.php) still reads it from disk,
+# so Stage 2 remains solvable only by chaining through the viewer.
+Require all denied

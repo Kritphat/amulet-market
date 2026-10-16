@@ -1,0 +1,12 @@
+MediTrust / Talad Phra — INTERNAL RECOVERY NOTE
+================================================
+Left by the previous administrator before offboarding. Do NOT share.
+
+If you are reading this, you found the staff-shared private/ directory.
+Nice traversal. Here is the Stage 2 proof-of-reach:
+
+    LOC9{p4th_tr4v3rs4l_lf1_r3c0v3ry_n0t3}
+
+Reminder to self: the admin console (/admin/) is still locked behind
+HTTP Basic Auth. The credential file sits right next to this note
+(.htpasswd). Crack it to finish the job.

@@ -1,0 +1,24 @@
+services:
+  web:
+    build: .
+    ports:
+      - "9000:80"
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASS: root
+      DB_NAME: medboard
+      # Base URL the สั่งซื้อ QR encodes so phones (not on this host) can open it.
+      # Set to this machine's LAN IP:port. Empty => fall back to the browser's origin.
+      PUBLIC_BASE_URL: "http://10.10.60.103:9000"
+      FLAG_STAGE1: "LOC9{sqli_w4f_byp4ss_st4ge1}"
+      FLAG: "LOC9{ch41n3d_sqli_2_tr4v3rsal_2_cr4ck3d}"
+    depends_on:
+      - db
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: medboard
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
