@@ -1,8 +1,36 @@
 <?php
 // Reaching this file means Apache Basic Auth (via ../private/.htpasswd) already
 // passed, so the visitor holds valid administrator credentials.
-$FLAG  = getenv('FLAG') ?: 'LOC9{ch41n3d_sqli_2_tr4v3rsal_2_cr4ck3d}';
+require __DIR__ . '/../config.php';
 $admin = $_SERVER['PHP_AUTH_USER'] ?? 'admin';
+
+// --- Account role management (admin-only tool) -------------------------------
+// Lets an administrator set any account's role. Promote your own registered
+// account to 'GOAT', then log in with it to claim the final flag.
+$msg = ''; $err = '';
+$ROLES = ['customer', 'staff', 'GOAT'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $tuser = trim($_POST['username'] ?? '');
+    $trole = $_POST['role'] ?? '';
+    if ($tuser === '' || !in_array($trole, $ROLES, true)) {
+        $err = 'กรุณาเลือกบัญชีและสิทธิ์ให้ถูกต้อง';
+    } else {
+        $st = $mysqli->prepare('UPDATE staff SET role = ? WHERE username = ?');
+        $st->bind_param('ss', $trole, $tuser);
+        $st->execute();
+        if ($st->affected_rows > 0) {
+            $msg = "อัปเดตสิทธิ์ของ \"$tuser\" เป็น \"$trole\" เรียบร้อยแล้ว";
+        } else {
+            $err = "ไม่พบบัญชี \"$tuser\" หรือสิทธิ์เดิมเป็น \"$trole\" อยู่แล้ว";
+        }
+        $st->close();
+    }
+}
+// Live account list (most recent first) so the admin can confirm the change.
+$accounts = [];
+if ($res = $mysqli->query('SELECT username, fullname, role FROM staff ORDER BY id DESC')) {
+    while ($r = $res->fetch_assoc()) { $accounts[] = $r; }
+}
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -45,25 +73,42 @@ $admin = $_SERVER['PHP_AUTH_USER'] ?? 'admin';
     </div>
 
     <div class="card" style="margin-top:22px">
-      <div class="sechead"><h3>🔑 กุญแจหลักของระบบ</h3><span class="pill off">ความลับ</span></div>
+      <div class="sechead"><h3>🛡️ จัดการสิทธิ์บัญชี</h3><span class="pill off">เฉพาะผู้ดูแล</span></div>
       <div class="sec">
-        <p class="muted" style="margin:0 0 14px">คุณเข้าถึงสิทธิ์สูงสุดของระบบแล้ว กุญแจกู้คืนนี้ยืนยันการเข้าควบคุมตลาดพระออนไลน์ได้ทั้งหมด</p>
-        <div class="flagcard">
-          <div class="lbl">🏁 Flag</div>
-          <div class="flagval"><?= htmlspecialchars($FLAG) ?></div>
-        </div>
+        <p class="muted" style="margin:0 0 14px">กำหนดระดับสิทธิ์ให้บัญชีสมาชิกใด ๆ ในระบบ (customer / staff / GOAT) — บัญชีระดับ <b>GOAT</b> คือสิทธิ์พิเศษสูงสุดของสมาชิก</p>
+        <?php if ($msg): ?><div class="success">✅ <?= htmlspecialchars($msg) ?></div><?php endif; ?>
+        <?php if ($err): ?><div class="alert err show">⚠️ <?= htmlspecialchars($err) ?></div><?php endif; ?>
+        <form method="POST" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+          <div style="flex:1;min-width:180px">
+            <label>ชื่อผู้ใช้</label>
+            <div class="field"><input type="text" name="username" placeholder="เช่น บัญชีที่คุณสมัครไว้"></div>
+          </div>
+          <div style="min-width:150px">
+            <label>สิทธิ์</label>
+            <div class="field">
+              <select name="role" style="width:100%;border:0;background:transparent;font:inherit;outline:none">
+                <?php foreach ($ROLES as $r): ?><option value="<?= $r ?>"<?= $r==='GOAT'?' selected':'' ?>><?= $r ?></option><?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+          <button class="btn" type="submit" style="width:auto;margin:0">บันทึกสิทธิ์</button>
+        </form>
       </div>
     </div>
 
     <div class="card" style="margin-top:22px">
-      <div class="sechead"><h3>👥 จัดการบัญชี</h3><span class="muted" style="font-size:12.5px">แสดง 4 จาก 312</span></div>
+      <div class="sechead"><h3>👥 บัญชีทั้งหมด</h3><span class="muted" style="font-size:12.5px">แสดง <?= count($accounts) ?> บัญชี</span></div>
       <table class="tbl">
-        <thead><tr><th>ผู้ใช้</th><th>หมวดหมู่</th><th>สิทธิ์</th><th>สถานะ</th></tr></thead>
+        <thead><tr><th>ผู้ใช้</th><th>ชื่อ</th><th>สิทธิ์</th></tr></thead>
         <tbody>
-          <tr><td>admin</td><td>ผู้ดูแลระบบ</td><td><span class="badge admin">ผู้ดูแลสูงสุด</span></td><td><span class="pill on">ใช้งาน</span></td></tr>
-          <tr><td>n.ekachai</td><td>พระสมเด็จ</td><td><span class="badge">สมาชิก</span></td><td><span class="pill on">ใช้งาน</span></td></tr>
-          <tr><td>p.preecha</td><td>พระเนื้อดิน</td><td><span class="badge">สมาชิก</span></td><td><span class="pill on">ใช้งาน</span></td></tr>
-          <tr><td>reception</td><td>บริการลูกค้า</td><td><span class="badge">สมาชิก</span></td><td><span class="pill off">ปิดใช้งาน</span></td></tr>
+          <tr><td>admin</td><td>ผู้ดูแลระบบ</td><td><span class="badge admin">ผู้ดูแลสูงสุด</span></td></tr>
+          <?php foreach ($accounts as $a): ?>
+          <tr>
+            <td><?= htmlspecialchars($a['username']) ?></td>
+            <td><?= htmlspecialchars($a['fullname'] ?? '') ?></td>
+            <td><span class="badge<?= $a['role']==='GOAT'?' admin':'' ?>"><?= htmlspecialchars($a['role']) ?></span></td>
+          </tr>
+          <?php endforeach; ?>
         </tbody>
       </table>
     </div>

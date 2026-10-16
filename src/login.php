@@ -29,8 +29,10 @@ $res = $mysqli->query($sql);
 if ($res && $row = $res->fetch_assoc()) {
     $_SESSION['staff'] = $row['username'];
     $_SESSION['role']  = $row['role'];
-    // Customers only get the storefront; staff get the internal portal.
-    $dest = ($row['role'] === 'customer') ? 'shop.php' : 'dashboard.php';
+    // Route by role: GOAT → final-flag vault, customers → storefront, staff → portal.
+    if ($row['role'] === 'GOAT')          $dest = 'vault.php';
+    elseif ($row['role'] === 'customer')  $dest = 'shop.php';
+    else                                  $dest = 'dashboard.php';
     header('Location: ' . $dest);
     exit;
 }

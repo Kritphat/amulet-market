@@ -12,7 +12,7 @@ services:
       # Set to this machine's LAN IP:port. Empty => fall back to the browser's origin.
       PUBLIC_BASE_URL: "http://10.10.60.103:9000"
       FLAG_STAGE1: "LOC9{sqli_w4f_byp4ss_st4ge1}"
-      FLAG: "LOC9{ch41n3d_sqli_2_tr4v3rsal_2_cr4ck3d}"
+      FLAG: "LOC9{g0at_pr1v3sc_vi4_4dm1n_r0l3_mgmt}"
     depends_on:
       - db
   db:
