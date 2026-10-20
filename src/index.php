@@ -66,12 +66,6 @@
       <div class="authfoot">
         พบปัญหาการเข้าสู่ระบบ? ติดต่อ <a href="/help.php" style="color:var(--teal-d)">ฝ่ายช่วยเหลือสมาชิก</a> · โทร. 02-000-4357
       </div>
-      <a href="/admin/" style="display:flex;align-items:center;justify-content:center;gap:8px;
-         margin-top:14px;padding:11px 14px;border:1px solid var(--teal-d);border-radius:10px;
-         color:var(--teal-d);font-weight:700;font-size:13.5px;text-decoration:none">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-        สำหรับผู้ดูแลระบบ — เข้าสู่คอนโซลผู้ดูแล →
-      </a>
     </div>
   </div>
 </div>
